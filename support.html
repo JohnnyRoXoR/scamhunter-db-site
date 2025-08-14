@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Support SCAMHUNTER</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+        // Copy wallet address to clipboard
+        function copyAddress(id) {
+            const text = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Address copied to clipboard');
+            });
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Support SCAMHUNTER</h1>
+        <p>Your donations help us maintain and expand the SCAMHUNTER project.</p>
+        <nav>
+            <a href="index.html">Database</a>
+            <a href="support.html">Support</a>
+            <a href="report.html">Report</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+    <main>
+        <h2>Donate to keep SCAMHUNTER running</h2>
+        <p>If you find our service useful, consider supporting us through a crypto donation. Every contribution helps keep traders safe.</p>
+        <div class="wallets">
+            <div class="wallet">
+                <h3>Solana (SOL)</h3>
+                <p id="sol-wallet">SoLq7uP7f1X2FfY6V1aM7Zzzzzzzzzzzzzzzzzzzzzzz</p>
+                <button onclick="copyAddress('sol-wallet')">Copy Address</button>
+            </div>
+            <div class="wallet">
+                <h3>Ethereum (ETH)</h3>
+                <p id="eth-wallet">0xEeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeEE</p>
+                <button onclick="copyAddress('eth-wallet')">Copy Address</button>
+            </div>
+            <div class="wallet">
+                <h3>Bitcoin (BTC)</h3>
+                <p id="btc-wallet">bc1qexampleexampleexampleexampleexamplex</p>
+                <button onclick="copyAddress('btc-wallet')">Copy Address</button>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; <span id="year"></span> SCAMHUNTER. All rights reserved.</p>
+    </footer>
+    <script>
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
