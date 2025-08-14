@@ -1,0 +1,27 @@
+[
+  {
+    "date": "2025-08-14",
+    "scammer_handle": "@M88SN_",
+    "name": "Crypto Sasha",
+    "platforms": ["Pump.fun", "X", "Telegram"],
+    "wallets": [
+      {"chain": "Solana", "address": "3Ca5wDmqK..."},
+      {"chain": "Ethereum", "address": "0xb8c19b1369..."}
+    ],
+    "proof_links": [],
+    "description": "Promised high returns and requested wallet connection to unknown sites.",
+    "status": "active"
+  },
+  {
+    "date": "2025-08-13",
+    "scammer_handle": "@Crypto_Queen",
+    "name": "Crypto Queen",
+    "platforms": ["X", "Telegram"],
+    "wallets": [
+      {"chain": "Bitcoin", "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"}
+    ],
+    "proof_links": [],
+    "description": "Fake investment scheme promising double returns.",
+    "status": "active"
+  }
+]
