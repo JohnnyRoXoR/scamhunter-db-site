@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCAMHUNTER Database</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="script.js"></script>
+</head>
+<body>
+    <header>
+        <h1>SCAMHUNTER Database</h1>
+        <p>Search and filter to stay safe in the crypto world.</p>
+    </header>
+    <main>
+        <div class="controls">
+            <input type="text" id="search-input" placeholder="Search by handle, name or wallet..." />
+            <select id="chain-filter">
+                <option value="">All Chains</option>
+                <option value="Ethereum">Ethereum</option>
+                <option value="Solana">Solana</option>
+                <option value="Bitcoin">Bitcoin</option>
+            </select>
+            <select id="status-filter">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="blocked">Blocked</option>
+            </select>
+        </div>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Handle</th>
+                    <th>Name</th>
+                    <th>Platforms</th>
+                    <th>Wallets</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+    </main>
+    <footer>
+        <p>&copy; <span id="year"></span> SCAMHUNTER. All rights reserved.</p>
+    </footer>
+</body>
+</html>
