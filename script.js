@@ -41,6 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
         applyFilters();
     });
 
+    // Quick filter button for Solana chain
+    const solFilterBtn = document.getElementById('filter-sol');
+    if (solFilterBtn) {
+        solFilterBtn.addEventListener('click', () => {
+            // Set the chain filter to Solana and reapply filters
+            chainFilter.value = 'Solana';
+            currentPage = 1;
+            applyFilters();
+        });
+    }
+
     // Filter data based on search and dropdowns
     function applyFilters() {
         const searchTerm = searchInput.value.toLowerCase();
