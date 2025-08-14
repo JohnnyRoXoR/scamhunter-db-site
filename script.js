@@ -1,129 +1,153 @@
-// Load and display data from data.json
+// JavaScript logic for loading data, applying filters and rendering the table
 document.addEventListener('DOMContentLoaded', () => {
+    let data = [];
+    let filteredData = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+
     const searchInput = document.getElementById('search-input');
     const chainFilter = document.getElementById('chain-filter');
     const statusFilter = document.getElementById('status-filter');
-    const tableBody = document.querySelector('#data-table tbody');
-    const paginationEl = document.getElementById('pagination');
-    const currentYearEl = document.getElementById('year');
-
-    let rawData = [];
-    let filteredData = [];
-    let currentPage = 1;
-    const pageSize = 10;
-
-    if (currentYearEl) {
-        currentYearEl.textContent = new Date().getFullYear();
-    }
-
-    // Fetch data from JSON file
-    fetch('data.json')
-        .then(response => response.json())
-        .then(data => {
-            rawData = data;
-            applyFilters();
-        })
-        .catch(err => {
-            console.error('Error loading data:', err);
-        });
-
-    // Apply filters whenever user changes search or select fields
-    searchInput.addEventListener('input', () => {
-        currentPage = 1;
-        applyFilters();
-    });
-    chainFilter.addEventListener('change', () => {
-        currentPage = 1;
-        applyFilters();
-    });
-    statusFilter.addEventListener('change', () => {
-        currentPage = 1;
-        applyFilters();
-    });
 
     // Quick filter button for Solana chain
     const solFilterBtn = document.getElementById('filter-sol');
     if (solFilterBtn) {
         solFilterBtn.addEventListener('click', () => {
-            // Set the chain filter to Solana and reapply filters
             chainFilter.value = 'Solana';
             currentPage = 1;
             applyFilters();
         });
     }
 
-    // Filter data based on search and dropdowns
+    function loadData() {
+        fetch('data.json')
+            .then((response) => response.json())
+            .then((json) => {
+                data = json;
+                applyFilters();
+            })
+            .catch((error) => console.error('Error loading data:', error));
+    }
+
     function applyFilters() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const chainValue = chainFilter.value;
-        const statusValue = statusFilter.value;
-        filteredData = rawData.filter(item => {
-            // Filter by search term across handle, name, description, wallet addresses
-            const matchesSearch = [
-                item.scammer_handle,
-                item.name,
-                item.description,
-                ...(item.wallets ? item.wallets.map(w => w.address) : [])
-            ].some(field => field && field.toLowerCase().includes(searchTerm));
-            // Filter by chain
-            const matchesChain = !chainValue || (item.wallets && item.wallets.some(w => w.chain === chainValue));
-            // Filter by status
-            const matchesStatus = !statusValue || item.status === statusValue;
-            return matchesSearch && matchesChain && matchesStatus;
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        const chainTerm = chainFilter ? chainFilter.value.toLowerCase() : '';
+        const statusTerm = statusFilter ? statusFilter.value.toLowerCase() : '';
+
+        filteredData = data.filter((item) => {
+            const matchSearch =
+                searchTerm === '' ||
+                item.scammer_handle.toLowerCase().includes(searchTerm) ||
+                item.name.toLowerCase().includes(searchTerm) ||
+                item.wallets.some((wallet) =>
+                    wallet.address.toLowerCase().includes(searchTerm)
+                );
+            const matchChain =
+                chainTerm === '' ||
+                item.wallets.some(
+                    (wallet) => wallet.chain.toLowerCase() === chainTerm
+                );
+            const matchStatus =
+                statusTerm === '' || item.status.toLowerCase() === statusTerm;
+            return matchSearch && matchChain && matchStatus;
         });
         renderTable();
+    }
+
+    function renderTable() {
+        const tbody = document.querySelector('#data-table tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const pageData = filteredData.slice(start, end);
+
+        pageData.forEach((item) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.date}</td>
+                <td><a href="${
+                    item.scammer_handle.startsWith('http')
+                        ? item.scammer_handle
+                        : '#'
+                }" target="_blank" rel="noopener">${
+                item.scammer_handle
+            }</a></td>
+                <td>${item.name}</td>
+                <td>${item.platforms.join(', ')}</td>
+                <td>${item.wallets
+                    .map(
+                        (wallet) =>
+                            `${wallet.chain}: ${wallet.address}`
+                    )
+                    .join('<br>')}</td>
+                <td>${item.description}</td>
+                <td>${item.status}</td>
+            `;
+            tbody.appendChild(row);
+        });
         renderPagination();
     }
 
-    // Render table rows
-    function renderTable() {
-        tableBody.innerHTML = '';
-        const start = (currentPage - 1) * pageSize;
-        const end = start + pageSize;
-        const pageItems = filteredData.slice(start, end);
-        pageItems.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${item.date || ''}</td>
-                <td>${item.scammer_handle || ''}</td>
-                <td>${item.name || ''}</td>
-                <td>${(item.platforms || []).join(', ')}</td>
-                <td>${(item.wallets || []).map(w => `${w.chain}: ${w.address}`).join('<br>')}</td>
-                <td>${item.description || ''}</td>
-                <td>${item.status || ''}</td>
-            `;
-            tableBody.appendChild(row);
+    function renderPagination() {
+        const pagination = document.getElementById('pagination');
+        if (!pagination) return;
+        pagination.innerHTML = '';
+        const totalPages =
+            Math.ceil(filteredData.length / rowsPerPage) || 1;
+
+        const createButton = (text, disabled, page) => {
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.disabled = disabled;
+            button.addEventListener('click', () => {
+                currentPage = page;
+                renderTable();
+            });
+            return button;
+        };
+
+        const prevButton = createButton(
+            'Previous',
+            currentPage === 1,
+            currentPage - 1
+        );
+        const nextButton = createButton(
+            'Next',
+            currentPage === totalPages,
+            currentPage + 1
+        );
+        pagination.appendChild(prevButton);
+        const pageInfo = document.createElement('span');
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+        pagination.appendChild(pageInfo);
+        pagination.appendChild(nextButton);
+    }
+
+    // Event listeners for search and filters
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            applyFilters();
+        });
+    }
+    if (chainFilter) {
+        chainFilter.addEventListener('change', () => {
+            currentPage = 1;
+            applyFilters();
+        });
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener('change', () => {
+            currentPage = 1;
+            applyFilters();
         });
     }
 
-    // Render pagination controls
-    function renderPagination() {
-        paginationEl.innerHTML = '';
-        const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
-        const prevBtn = document.createElement('button');
-        prevBtn.textContent = 'Previous';
-        prevBtn.disabled = currentPage <= 1;
-        prevBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderTable();
-                renderPagination();
-            }
-        });
-        paginationEl.appendChild(prevBtn);
-        const pageInfo = document.createElement('span');
-        pageInfo.textContent = ` Page ${currentPage} of ${totalPages} `;
-        paginationEl.appendChild(pageInfo);
-        const nextBtn = document.createElement('button');
-        nextBtn.textContent = 'Next';
-        nextBtn.disabled = currentPage >= totalPages;
-        nextBtn.addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderTable();
-                renderPagination();
-            }
-        });
-        paginationEl.appendChild(nextBtn);
-    }
+    // Set current year in footer
+    const yearElem = document.getElementById('year');
+    if (yearElem) yearElem.textContent = new Date().getFullYear();
+
+    loadData();
 });
